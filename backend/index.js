@@ -1,22 +1,33 @@
 const express = require("express");
 const app = express();
-const mysql = require("mysql2");
 require("dotenv").config();
 
-const connection = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USERNAME,
-  password: process.env.DB_PASS,
-  database: process.env.DB_DBID,
-});
-// console.log(connection);
-connection.query("SELECT * FROM `test`", (err, results, fields) => {
-  console.log(results); // results contains rows returned by server
-  // console.log(fields); // fields contains extra meta data about results, if available
+app.use(express.json());
+
+const { connection, dbQuery } = require("./database");
+
+connection.query(`USE ${process.env.DB_DBID}`);
+
+app.get("/", async (req, res) => {
+  try {
+    let data = await dbQuery("SELECT * FROM `products`");
+    res.json({ products: data[0], request: "success" });
+  } catch (e) {
+    res.json({ data: "Data failed to fetch", error: e.code });
+  }
 });
 
-app.get("/", (req, res) => {
-  res.json({ testing: "Test" });
+app.post("/signup", async (req, res) => {
+  const { password, username, firstName, lastName, email } = req.body;
+  if ((username, password, firstName, lastName, email)) {
+    let user = await connection.promise()
+      .query(`INSERT INTO users (firstName, lastName, email, username, password, isAdmin)
+    VALUES ('${firstName}', '${lastName}', '${email}', '${username}', '${password}', false )`);
+    console.log(user);
+  } else {
+    console.log("error");
+  }
+  res.sendStatus(200);
 });
 
 app.listen(3000, () => {
