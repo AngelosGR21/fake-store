@@ -1,0 +1,36 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+.navbar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.categoriesContainer {
+  display: flex;
+  justify-content: space-between;
+  width: 40%;
+}
+.logo {
+  width: 180px;
+  align-self: center;
+  margin-right: auto;
+}
+.authCartContainer {
+  display: flex;
+  width: 40%;
+  justify-content: space-evenly;
+}
+.cartIcon {
+  margin-right: 10px;
+}
+.gender {
+  text-decoration: none;
+}
+// .selectedGender {
+//   // background-color: red;
+// }
+.category {
+  cursor: pointer;
+}

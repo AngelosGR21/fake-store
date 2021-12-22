@@ -2,38 +2,67 @@ import { React, useState } from "react";
 import { Link } from "react-router-dom";
 import { Badge, Typography, Breadcrumbs } from "@mui/material";
 
-// import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+//Icons
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ShoppingBasketIcon from "@mui/icons-material/ShoppingBasket";
 import img from "../images/cover.png";
 
+//Stylesheet
+import "../stylesheets/Navbar.scss";
+
 const Navbar = () => {
+  const [rotateC, setRotateC] = useState(0);
+  const [rotateS, setRotateS] = useState(0);
   return (
     <>
-      <nav
-        style={{
-          display: "flex",
-          width: "100%",
-          justifyContent: "center",
-        }}
-      >
-        <Breadcrumbs separator="|" style={{ display: "flex", height: "50px" }}>
-          <Link to="/men">Men</Link>
-          <Link to="/women">Women</Link>
-        </Breadcrumbs>
-        <Typography>Clothing</Typography>
-        <Typography>Shoes</Typography>
-        <img
-          src={img}
-          alt="logo"
-          style={{ width: "200px", borderRadius: "10px" }}
-        ></img>
-        <Link to="/signup">Sign up</Link>
-        <Link to="/login">Log in</Link>
-        <Badge color="success" showZero max={99}>
-          <Link to="/basket">
-            <ShoppingBasketIcon />
-          </Link>
-        </Badge>
+      <nav className="navbar">
+        <div className="categoriesContainer">
+          <Breadcrumbs separator="|" className="breadcrumbs">
+            <Link to="/men-home" className="gender">
+              Men
+            </Link>
+            <Link to="/women-home" className="gender selectedGender">
+              Women
+            </Link>
+          </Breadcrumbs>
+          <Typography
+            className="category"
+            onMouseEnter={() => setRotateC(180)}
+            onMouseLeave={() => setRotateC(0)}
+          >
+            Clothing{" "}
+            <ExpandMoreIcon
+              style={{
+                transition: "transform 1s",
+                transform: `rotate(${rotateC}deg)`,
+              }}
+            />
+          </Typography>
+          <Typography
+            className="category"
+            onMouseEnter={() => setRotateS(180)}
+            onMouseLeave={() => setRotateS(0)}
+          >
+            Shoes{" "}
+            <ExpandMoreIcon
+              style={{
+                transition: "transform 1s",
+                transform: `rotate(${rotateS}deg)`,
+              }}
+            />
+          </Typography>
+        </div>
+        <img src={img} alt="logo" className="logo"></img>
+        <div className="authCartContainer">
+          <Link to="/signup">Sign up </Link>
+          <Link to="/login">Log in</Link>
+          <Badge color="success" showZero max={99} className="cartIcon">
+            <Link to="/basket">
+              <ShoppingBasketIcon />
+            </Link>
+          </Badge>
+        </div>
       </nav>
     </>
   );
