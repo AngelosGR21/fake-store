@@ -2,7 +2,9 @@ const express = require("express");
 const app = express();
 require("dotenv").config();
 const uid = require("uid").uid;
+const cors = require("cors");
 
+app.use(cors());
 app.use(express.json());
 
 const { connection, dbQuery } = require("./database");
@@ -51,16 +53,15 @@ app.get("/api/users", async (req, res) => {
   }
 });
 
-app.get("/api/users/:id");
-app.put("/api/users/:id");
-app.delete("/api/users/:id");
-
+//creating user
 app.post("/api/signup", async (req, res) => {
-  const { password, username, firstName, lastName, email } = req.body;
-  if ((username, password, firstName, lastName, email)) {
+  //destructuring user details
+  const { username, password, firstName, surname, email } = req.body;
+  //if all details are available create a new user
+  if ((username, password, firstName, surname, email)) {
     await connection.promise()
-      .query(`INSERT INTO users (id,firstName, lastName, email, username, password, isAdmin)
-    VALUES ('${uid()}','${firstName}', '${lastName}', '${email}', '${username}', '${password}', false )`);
+      .query(`INSERT INTO users (id,firstName, surname, email, username, password, isAdmin)
+     VALUES ('${uid()}','${firstName}', '${surname}', '${email}', '${username}', '${password}', false )`);
     let userCreated = await connection
       .promise()
       .query(`SELECT * FROM users WHERE firstName = '${firstName}'`);
@@ -70,6 +71,6 @@ app.post("/api/signup", async (req, res) => {
   }
 });
 
-app.listen(3000, () => {
-  console.log("listening on port 3000");
+app.listen(5000, () => {
+  console.log("listening on port 5000");
 });
