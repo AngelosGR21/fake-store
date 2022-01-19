@@ -44,12 +44,14 @@ const fetchUsers = async () => {
   }
 };
 
-const getUserDetails = async (state) => {
+const getUserDetails = async () => {
   try {
-    const data = await axios.get("http://localhost:5000/api/userInfo", {
-      headers: { "x-access-token": localStorage.getItem("token") },
-    });
-    return data.data;
+    if (localStorage.getItem("token")) {
+      const data = await axios.get("http://localhost:5000/api/userInfo", {
+        headers: { "x-access-token": localStorage.getItem("token") },
+      });
+      return data.data;
+    }
   } catch (e) {
     return e.response.data;
   }
