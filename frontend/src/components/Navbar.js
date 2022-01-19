@@ -1,4 +1,4 @@
-import { React, useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Badge, Typography, Breadcrumbs } from "@mui/material";
 
@@ -11,9 +11,27 @@ import img from "../images/cover.png";
 //Stylesheet
 import "../stylesheets/Navbar.scss";
 
+//User data
+import { getUserDetails } from "../utils/usersAPI";
+
 const Navbar = () => {
   const [rotateC, setRotateC] = useState(0);
   const [rotateS, setRotateS] = useState(0);
+  const [username, setUsername] = useState(false);
+
+  const verifyUser = async () => {
+    const userDetails = await getUserDetails();
+    if (userDetails) {
+      if (userDetails.request) {
+        setUsername(userDetails.userDetails.username);
+      }
+    }
+  };
+
+  useEffect(() => {
+    verifyUser();
+  }, []);
+
   return (
     <>
       <nav className="navbar">
@@ -55,8 +73,15 @@ const Navbar = () => {
         </div>
         <img src={img} alt="logo" className="logo"></img>
         <div className="authCartContainer">
-          <Link to="/signup">Sign up </Link>
-          <Link to="/login">Log in</Link>
+          {username ? (
+            <Link to="/panel">username</Link>
+          ) : (
+            <>
+              <Link to="/signup">Sign up </Link>
+              <Link to="/login">Log in</Link>
+            </>
+          )}
+
           <Badge color="success" showZero max={99} className="cartIcon">
             <Link to="/basket">
               <ShoppingBasketIcon />

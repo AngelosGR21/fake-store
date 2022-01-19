@@ -20,12 +20,13 @@ const Signup = () => {
     email: false,
     username: false,
   });
-  //verifying if user is logged in
+  //if user is logged in redirect to homepage
   const verifyUser = async () => {
-    let userDetails = await getUserDetails();
-    //if user is logged in redirect to homepage
-    if (userDetails.request) {
-      navigate("/");
+    const userDetails = await getUserDetails();
+    if (userDetails) {
+      if (userDetails.request) {
+        navigate("/");
+      }
     }
   };
 

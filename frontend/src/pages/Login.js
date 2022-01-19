@@ -14,8 +14,10 @@ const Login = () => {
   const verifyUser = async () => {
     let userDetails = await getUserDetails();
     //if user is logged in redirect to homepage
-    if (userDetails.request) {
-      navigate("/");
+    if (userDetails) {
+      if (userDetails.request) {
+        navigate("/");
+      }
     }
   };
 
