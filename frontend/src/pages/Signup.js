@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Box, TextField, Button } from "@mui/material";
 
 import { useNavigate } from "react-router-dom";
 
-import { createUser } from "../utils/usersAPI";
+import { createUser, getUserDetails } from "../utils/usersAPI";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -20,33 +20,47 @@ const Signup = () => {
     email: false,
     username: false,
   });
+  //verifying if user is logged in
+  const verifyUser = async () => {
+    let userDetails = await getUserDetails();
+    //if user is logged in redirect to homepage
+    if (userDetails.request) {
+      navigate("/");
+    }
+  };
 
   //Creating user on submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     let response = await createUser(details);
-    if (response === "success") {
+    if (response.request) {
       setDisableButton(true);
       setTimeout(() => {
         navigate("/");
       }, 1000);
-    } else if (response === "Username and email are already being used") {
+    } else if (
+      response.message === "Username and email are already being used"
+    ) {
       setError({
         email: true,
         username: true,
       });
-    } else if (response === "Username is taken") {
+    } else if (response.message === "Username is taken") {
       setError({
         ...error,
         username: true,
       });
-    } else if (response === "Email is already being used") {
+    } else if (response.message === "Email is already being used") {
       setError({
         ...error,
         email: true,
       });
     }
   };
+
+  useEffect(() => {
+    verifyUser();
+  }, []);
 
   return (
     <Box
