@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 //material-ui components
@@ -18,10 +18,16 @@ import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOu
 //logo
 import logo from "../images/cover.png";
 
-const Sidebar = (props) => {
+const Sidebar = ({ allUsers, setCurrentPage }) => {
   const [isSelected, setIsSelected] = useState(1);
+
+  const handleClick = (page) => {
+    setIsSelected(page);
+    setCurrentPage(page);
+  };
+
   //if user is admin show a different sidebar
-  if (props.props) {
+  if (allUsers) {
     return (
       <>
         <Box
@@ -41,7 +47,7 @@ const Sidebar = (props) => {
             <ListItem
               disablePadding
               selected={isSelected === 1 ? true : false}
-              onClick={() => setIsSelected(1)}
+              onClick={() => handleClick(1)}
             >
               <ListItemButton>
                 <ListItemIcon>
@@ -53,7 +59,7 @@ const Sidebar = (props) => {
             <ListItem
               disablePadding
               selected={isSelected === 2 ? true : false}
-              onClick={() => setIsSelected(2)}
+              onClick={() => handleClick(2)}
             >
               <ListItemButton>
                 <ListItemIcon>
@@ -65,7 +71,7 @@ const Sidebar = (props) => {
             <ListItem
               disablePadding
               selected={isSelected === 3 ? true : false}
-              onClick={() => setIsSelected(3)}
+              onClick={() => handleClick(3)}
             >
               <ListItemButton>
                 <ListItemIcon>
@@ -77,7 +83,7 @@ const Sidebar = (props) => {
             <ListItem
               disablePadding
               selected={isSelected === 4 ? true : false}
-              onClick={() => setIsSelected(4)}
+              onClick={() => handleClick(4)}
             >
               <ListItemButton>
                 <ListItemIcon>
@@ -89,7 +95,7 @@ const Sidebar = (props) => {
             <ListItem
               disablePadding
               selected={isSelected === 5 ? true : false}
-              onClick={() => setIsSelected(5)}
+              onClick={() => handleClick(5)}
             >
               <ListItemButton>
                 <ListItemIcon>

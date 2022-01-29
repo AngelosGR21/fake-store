@@ -10,6 +10,7 @@ import Sidebar from "../components/Sidebar.js";
 const Profile = () => {
   const navigate = useNavigate();
   const [allUsers, setAllUsers] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const verifyIfAdmin = async () => {
     let details = await getUserDetails();
@@ -28,15 +29,19 @@ const Profile = () => {
       }
     }
   };
-
   useEffect(() => {
     verifyIfAdmin();
   }, []);
 
   if (allUsers) {
-    return <Sidebar props={allUsers} />;
+    return (
+      <div style={{ display: "flex" }}>
+        <Sidebar allUsers={allUsers} setCurrentPage={setCurrentPage} />
+        <h1>{currentPage}</h1>
+      </div>
+    );
   } else {
-    return <Sidebar />;
+    return <Sidebar setCurrentPage={setCurrentPage} />;
   }
 };
 
