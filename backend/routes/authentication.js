@@ -6,7 +6,10 @@ const {
   userDetails,
 } = require("../controllers/authentication");
 
-router.get("/userInfo", userDetails);
+//middleware
+const { verifyUser } = require("../middleware");
+
+router.get("/userInfo", verifyUser, userDetails);
 router.post("/signup", createUser);
 router.post("/login", loginUser);
 

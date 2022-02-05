@@ -3,8 +3,9 @@ const jwt = require("jsonwebtoken");
 const uid = require("uid").uid;
 const bcrypt = require("bcrypt");
 require("dotenv").config();
+const ApiError = require("../utils/error");
 
-const createUser = async (req, res) => {
+const createUser = async (req, res, next) => {
   try {
     //destructuring user details
     const { username, password, firstName, surname, email } = req.body;
@@ -41,7 +42,8 @@ const createUser = async (req, res) => {
           process.env.SECRET,
           { algorithm: "HS256" }
         );
-        res.status(201).json({
+        //success response
+        return res.status(201).json({
           request: true,
           id: userCreated[0][0].id,
           isAdmin: userCreated[0][0].isAdmin,
@@ -51,38 +53,31 @@ const createUser = async (req, res) => {
       } else {
         //if username and email are in use
         if (usernameCheck[0].length && emailCheck[0].length) {
-          return res.status(406).json({
-            request: false,
-            message: "Username and email are already being used",
-          });
+          next(new ApiError(406, "Username and email are already in use"));
+          return;
         }
         //if only username is in use
         if (usernameCheck[0].length) {
-          return res.status(406).json({
-            request: false,
-            message: "Username is taken",
-          });
+          next(new ApiError(406, "Username is taken"));
+          return;
         }
         //if only email is in use
         if (emailCheck[0].length) {
-          return res.status(406).json({
-            request: false,
-            message: "Email is already being used",
-          });
+          next(new ApiError(406, "Email is already being used"));
+          return;
         }
       }
     } else {
-      res.status(500).json({
-        request: "failed",
-        message: "Something went wrong, please try again later",
-      });
+      // fields are missing
+      next(new ApiError(406, "some fields are missing"));
+      return;
     }
   } catch (e) {
-    console.log(e);
+    next("error");
   }
 };
 
-const loginUser = async (req, res) => {
+const loginUser = async (req, res, next) => {
   try {
     const { username, password } = req.body;
     //querying into the db to find user
@@ -116,23 +111,20 @@ const loginUser = async (req, res) => {
           token,
         });
       } else {
-        return res.status(406).json({
-          request: "failed",
-          message: "Username or password incorrect",
-        });
+        next(new ApiError(406, "Username or password incorrect"));
+        next("error");
+        return;
       }
     } else {
-      return res.status(406).json({
-        request: "failed",
-        message: "Username or password incorrect",
-      });
+      next(new ApiError(406, "Username or password incorrect"));
+      return;
     }
   } catch (e) {
-    console.log(e);
+    next("error");
   }
 };
 
-const userDetails = (req, res) => {
+const userDetails = (req, res, next) => {
   let token = req.headers["x-access-token"];
   //if token was found
   if (token !== "null") {
@@ -151,17 +143,13 @@ const userDetails = (req, res) => {
         userDetails: user,
       });
     } else {
-      return res.status(400).json({
-        request: false,
-        message: "Token is invalid",
-      });
+      next(new ApiError(400, "Token is invalid"));
+      return;
     }
   }
   //return false as token didn't pass verification
-  return res.status(404).json({
-    request: false,
-    message: "Token was not found",
-  });
+  next(new ApiError(404, "Token was not found"));
+  return;
 };
 
 module.exports = { createUser, loginUser, userDetails };
