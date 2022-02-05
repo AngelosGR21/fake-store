@@ -22,11 +22,15 @@ connection.query(`USE ${process.env.DB_DBID}`);
 const userRoutes = require("./routes/authentication");
 const adminRoutes = require("./routes/admin");
 const productRoutes = require("./routes/products");
+const errorHandler = require("./utils/error-handler");
 
 //ROUTES TESTING
 app.use("/api/user", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/products", productRoutes);
+
+//error handling
+app.use(errorHandler);
 
 app.listen(process.env.PORT || 5000, () => {
   console.log("listening on port 5000");
