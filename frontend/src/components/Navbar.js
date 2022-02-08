@@ -6,6 +6,7 @@ import { Badge, Typography, Breadcrumbs } from "@mui/material";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ShoppingBasketIcon from "@mui/icons-material/ShoppingBasket";
+import LogoutIcon from "@mui/icons-material/Logout";
 import img from "../images/cover.png";
 
 //Stylesheet
@@ -26,6 +27,11 @@ const Navbar = () => {
         setUser(true);
       }
     }
+  };
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    window.location.reload();
   };
 
   const handleDropdown = (state) => {
@@ -98,6 +104,7 @@ const Navbar = () => {
                 <Link to="/profile/wishlist">
                   <FavoriteBorderIcon />
                 </Link>
+                <LogoutIcon onClick={logout} style={{ cursor: "pointer" }} />
               </>
             ) : (
               // else show the links

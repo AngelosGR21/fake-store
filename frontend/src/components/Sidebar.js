@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 //material-ui components
 import { Box } from "@mui/system";
@@ -14,16 +14,24 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import PeopleOutlineIcon from "@mui/icons-material/PeopleOutline";
 import LibraryBooksOutlinedIcon from "@mui/icons-material/LibraryBooksOutlined";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
+import ShoppingBasketOutlinedIcon from "@mui/icons-material/ShoppingBasketOutlined";
+import LogoutIcon from "@mui/icons-material/Logout";
 
 //logo
 import logo from "../images/cover.png";
 
 const Sidebar = ({ allUsers, setCurrentPage }) => {
+  const navigate = useNavigate();
   const [isSelected, setIsSelected] = useState(1);
 
   const handleClick = (page) => {
     setIsSelected(page);
     setCurrentPage(page);
+  };
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    navigate("/");
   };
 
   //if user is admin show a different sidebar
@@ -35,12 +43,10 @@ const Sidebar = ({ allUsers, setCurrentPage }) => {
           style={{
             backgroundColor: "#eeeeee",
             height: "100vh",
-            marginTop: "auto",
-            marginBottom: "auto",
           }}
         >
           <Link to="/">
-            <img src={logo} style={{ width: 200 }} />
+            <img src={logo} style={{ width: 200 }} alt="logo" />
           </Link>
 
           <List>
@@ -66,6 +72,14 @@ const Sidebar = ({ allUsers, setCurrentPage }) => {
                   <FavoriteBorderIcon />
                 </ListItemIcon>
                 <ListItemText>Wishlist</ListItemText>
+              </ListItemButton>
+            </ListItem>
+            <ListItem disablePadding onClick={() => navigate("/basket")}>
+              <ListItemButton>
+                <ListItemIcon>
+                  <ShoppingBasketOutlinedIcon />
+                </ListItemIcon>
+                <ListItemText>Basket</ListItemText>
               </ListItemButton>
             </ListItem>
             <ListItem
@@ -104,6 +118,14 @@ const Sidebar = ({ allUsers, setCurrentPage }) => {
                 <ListItemText>New Product</ListItemText>
               </ListItemButton>
             </ListItem>
+            <ListItem disablePadding onClick={logout}>
+              <ListItemButton>
+                <ListItemIcon>
+                  <LogoutIcon />
+                </ListItemIcon>
+                <ListItemText>Logout</ListItemText>
+              </ListItemButton>
+            </ListItem>
           </List>
         </Box>
       </>
@@ -111,9 +133,16 @@ const Sidebar = ({ allUsers, setCurrentPage }) => {
   } else {
     //user is a customer
     return (
-      <Box width={200} style={{ backgroundColor: "#eeeeee" }}>
+      <Box width={200} style={{ backgroundColor: "#eeeeee", height: "100vh" }}>
+        <Link to="/">
+          <img src={logo} style={{ width: 200 }} alt="logo" />
+        </Link>
         <List>
-          <ListItem disablePadding>
+          <ListItem
+            disablePadding
+            selected={isSelected === 1 ? true : false}
+            onClick={() => handleClick(1)}
+          >
             <ListItemButton>
               <ListItemIcon>
                 <AccountCircleIcon />
@@ -121,12 +150,32 @@ const Sidebar = ({ allUsers, setCurrentPage }) => {
               <ListItemText>Your Details</ListItemText>
             </ListItemButton>
           </ListItem>
-          <ListItem disablePadding>
+          <ListItem
+            disablePadding
+            selected={isSelected === 2 ? true : false}
+            onClick={() => handleClick(2)}
+          >
             <ListItemButton>
               <ListItemIcon>
                 <FavoriteBorderIcon />
               </ListItemIcon>
               <ListItemText>Wishlist</ListItemText>
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding onClick={() => navigate("/basket")}>
+            <ListItemButton>
+              <ListItemIcon>
+                <ShoppingBasketOutlinedIcon />
+              </ListItemIcon>
+              <ListItemText>Basket</ListItemText>
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding onClick={logout}>
+            <ListItemButton>
+              <ListItemIcon>
+                <LogoutIcon />
+              </ListItemIcon>
+              <ListItemText>Logout</ListItemText>
             </ListItemButton>
           </ListItem>
         </List>
