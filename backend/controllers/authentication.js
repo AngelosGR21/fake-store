@@ -40,7 +40,7 @@ const createUser = async (req, res, next) => {
             email: checkUser[0][0].email,
           },
           process.env.SECRET,
-          { algorithm: "HS256" }
+          { algorithm: "HS256", expiresIn: "2days" }
         );
         //success response
         return res.status(201).json({
@@ -101,9 +101,7 @@ const loginUser = async (req, res, next) => {
             email: checkUser[0][0].email,
           },
           process.env.SECRET,
-          {
-            algorithm: "HS256",
-          }
+          { algorithm: "HS256", expiresIn: "2days" }
         );
         return res.json({
           request: "success",
