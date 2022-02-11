@@ -10,15 +10,11 @@ const createUser = async (req, res, next) => {
     //destructuring user details
     const { username, password, firstName, surname, email } = req.body;
     //if all details are available create a new user
-    if ((username, password, firstName, surname, email)) {
+    if (username && password && firstName && surname && email) {
       //checking if username is already being used
-      let usernameCheck = await dbQuery(
-        `SELECT * FROM users WHERE username = '${username}'`
-      );
+      let usernameCheck = await dbQuery(`SELECT * FROM users WHERE username = '${username}'`);
       //checking if email is already being used
-      let emailCheck = await dbQuery(
-        `SELECT * FROM users WHERE email = '${email}'`
-      );
+      let emailCheck = await dbQuery(`SELECT * FROM users WHERE email = '${email}'`);
       //if the length is  0 = username is available else username is not available
       if (!usernameCheck[0].length && !emailCheck[0].length) {
         //hashing password so we can store it in the db
@@ -32,12 +28,12 @@ const createUser = async (req, res, next) => {
         //creating token
         let token = jwt.sign(
           {
-            isAdmin: checkUser[0][0].isAdmin,
-            id: checkUser[0][0].id,
-            username: checkUser[0][0].username,
-            firstName: checkUser[0][0].firstName,
-            surname: checkUser[0][0].surname,
-            email: checkUser[0][0].email,
+            isAdmin: userCreated[0][0].isAdmin,
+            id: userCreated[0][0].id,
+            username: userCreated[0][0].username,
+            firstName: userCreated[0][0].firstName,
+            surname: userCreated[0][0].surname,
+            email: userCreated[0][0].email,
           },
           process.env.SECRET,
           { algorithm: "HS256", expiresIn: "2days" }
@@ -150,4 +146,82 @@ const userDetails = (req, res, next) => {
   return;
 };
 
-module.exports = { createUser, loginUser, userDetails };
+const updateUser = async (req, res, next) => {
+  try {
+    let fetchUser = await dbQuery(`SELECT * FROM users WHERE id = "${req.userID}"`);
+    let user = fetchUser[0][0];
+    const { endpoint } = req.params;
+    // ~~~~~~~~~~~~ ENDPOINTS ~~~~~~~~~~~~
+    // general = username/firstName.surname
+    // email = email
+    // password = password
+     // ~~~~~~~~~~~~ ENDPOINTS ~~~~~~~~~~~~
+    if (endpoint === "general") {
+      const { username, firstName, surname } = req.body;
+      //checking if username already exists
+      let checkUsername = await dbQuery(`SELECT username FROM users WHERE username = '${username}'`);
+       //if username doesn't exist update all data
+       if(!checkUsername[0].length){
+        let updateUserDetails = await dbQuery(`UPDATE users SET username = "${username}", firstName = "${firstName}", surname = "${surname}" WHERE id = "${req.userID}"`);
+        return res.json({request: true, moreInformation: updateUserDetails})
+      }
+      //if username is same as the already existing, update data except username
+      if (checkUsername[0].length && checkUsername[0][0].username === user.username) {
+        let updateUserDetails = await dbQuery(`UPDATE users SET firstName = "${firstName}", surname = "${surname}" WHERE id = "${req.userID}"`);
+        return res.status(200).json({ 
+          request: true, 
+          moreInformation: updateUserDetails  });
+      }
+      //if username already exists
+      if(checkUsername[0][0].username !== user.username){
+        return next(new ApiError(406, "Username taken"))
+      }
+    }else if(endpoint === "email"){
+      const {email} = req.body;
+      let checkEmail = await dbQuery(`SELECT email from users WHERE email = "${email}"`);
+      //if the email provided is same as the one already in use
+      if(checkEmail[0].length && checkEmail[0][0].email === user.email){
+        return next(new ApiError(406, "This is your current email"));
+      }
+      //if email already exists
+      if(checkEmail[0].length){
+        return next(new ApiError(406, "Email is already being used"));
+      }else{
+        //email provided is available
+        let updateEmail = await dbQuery(`UPDATE users SET email = "${email}" WHERE id = "${req.userID}"`)
+        return res.status(200).json({
+          request: true,
+          moreInformation: updateEmail
+        })
+      }
+    }else if(endpoint === "password"){
+      const {password, newPassword} = req.body;
+      if(password, newPassword){
+        //verifying password for user confirmation 
+        let match = await bcrypt.compare(password, user.password)
+        //if matched then update password
+        if(match){
+          //hashing new password
+          let newHashedPass = await bcrypt.hash(newPassword, 15); 
+           //updating password
+          let updatePassword = await dbQuery(`UPDATE users SET password = "${newHashedPass}" WHERE id = "${req.userID}"`);
+          return res.status(200).json({
+            request: true,
+            moreInformation: updatePassword
+          })
+        }else{
+          return next("error")
+        }
+        
+      }else{
+        return next(new ApiError(400, "Please insert both fields"))
+      }
+    }else{
+      return next(new ApiError(404, `Route with '${endpoint}' endpoint was not found`));
+    }
+  } catch (e) {
+    return next("error");
+  }
+};
+
+module.exports = { createUser, loginUser, userDetails, updateUser };
