@@ -14,6 +14,7 @@ const verifyUser = (req, res, next) => {
     });
     //if token passed verification give access to route
     if (user) {
+      req.userID = user.id;
       next();
       return;
     } else {
