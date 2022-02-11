@@ -2,12 +2,17 @@ import axios from "axios";
 
 const createUser = async (details) => {
   try {
-    let data = await axios.post("http://localhost:5000/api/signup", details, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      withCredentials: true,
-    });
+    let data = await axios.post(
+      "http://localhost:5000/api/user/signup",
+      details,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      }
+    );
+    localStorage.setItem("token", data.data.token)
     return data.data;
   } catch (e) {
     let response = e.response.data;
@@ -17,13 +22,17 @@ const createUser = async (details) => {
 
 const loginUser = async (details) => {
   try {
-    const data = await axios.post("http://localhost:5000/api/login", details, {
-      headers: {
-        "Content-Type": "application/json",
-        "x-access-token": localStorage.getItem("token"),
-      },
-      withCredentials: true,
-    });
+    const data = await axios.post(
+      "http://localhost:5000/api/user/login",
+      details,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "x-access-token": localStorage.getItem("token"),
+        },
+        withCredentials: true,
+      }
+    );
     localStorage.setItem("token", data.data.token);
     return data.data;
   } catch (e) {
@@ -33,12 +42,11 @@ const loginUser = async (details) => {
 
 const fetchUsers = async () => {
   try {
-    const data = await axios.get("http://localhost:5000/api/users", {
+    const data = await axios.get("http://localhost:5000/api/admin/users", {
       headers: { "x-access-token": localStorage.getItem("token") },
     });
     return data.data.data;
   } catch (e) {
-    console.log(e.response);
     let responseMessage = e.response.data.message;
     return responseMessage;
   }
@@ -47,7 +55,7 @@ const fetchUsers = async () => {
 const getUserDetails = async () => {
   try {
     if (localStorage.getItem("token")) {
-      const data = await axios.get("http://localhost:5000/api/userInfo", {
+      const data = await axios.get("http://localhost:5000/api/user/userInfo", {
         headers: { "x-access-token": localStorage.getItem("token") },
       });
       return data.data;

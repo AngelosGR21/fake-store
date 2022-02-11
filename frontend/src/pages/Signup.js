@@ -39,23 +39,25 @@ const Signup = () => {
       setTimeout(() => {
         navigate("/");
       }, 1000);
-    } else if (
-      response.message === "Username and email are already being used"
-    ) {
-      setError({
-        email: true,
-        username: true,
-      });
-    } else if (response.message === "Username is taken") {
-      setError({
-        ...error,
-        username: true,
-      });
-    } else if (response.message === "Email is already being used") {
-      setError({
-        ...error,
-        email: true,
-      });
+    }else{
+      if(response.message === "Username and email are already in use") {
+        setError({
+          email: true,
+          username: true,
+        });
+      } 
+      if (response.message === "Username is taken") {
+        setError({
+          ...error,
+          username: true,
+        });
+      }
+      if (response.message === "Email is already being used") {
+        setError({
+          ...error,
+          email: true,
+        });
+      }
     }
   };
 
