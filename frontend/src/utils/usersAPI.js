@@ -65,4 +65,17 @@ const getUserDetails = async () => {
   }
 };
 
-export { createUser, loginUser, fetchUsers, getUserDetails };
+const updateUserDetails = async (endpoint, details) => {
+  try{
+    const data = await axios.put(`http://localhost:5000/api/user/update/${endpoint}`, details,
+    { 
+      headers:  {"x-access-token": localStorage.getItem("token")}
+    });
+    localStorage.setItem("token", data.data.token);
+    return data.data;
+  }catch(e){
+    return e.response.data;
+  }
+}
+
+export { createUser, loginUser, fetchUsers, getUserDetails, updateUserDetails };
