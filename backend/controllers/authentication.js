@@ -4,6 +4,7 @@ const uid = require("uid").uid;
 const bcrypt = require("bcrypt");
 require("dotenv").config();
 const ApiError = require("../utils/error");
+const createToken = require("../utils/createToken");
 
 const createUser = async (req, res, next) => {
   try {
@@ -26,18 +27,7 @@ const createUser = async (req, res, next) => {
           `SELECT * FROM users WHERE username = '${username}'`
         );
         //creating token
-        let token = jwt.sign(
-          {
-            isAdmin: userCreated[0][0].isAdmin,
-            id: userCreated[0][0].id,
-            username: userCreated[0][0].username,
-            firstName: userCreated[0][0].firstName,
-            surname: userCreated[0][0].surname,
-            email: userCreated[0][0].email,
-          },
-          process.env.SECRET,
-          { algorithm: "HS256", expiresIn: "2days" }
-        );
+        let token = createToken(userCreated);
         //success response
         return res.status(201).json({
           request: true,
@@ -49,26 +39,22 @@ const createUser = async (req, res, next) => {
       } else {
         //if username and email are in use
         if (usernameCheck[0].length && emailCheck[0].length) {
-          next(new ApiError(406, "Username and email are already in use"));
-          return;
+          return next(new ApiError(406, "Username and email are already in use"));
         }
         //if only username is in use
         if (usernameCheck[0].length) {
-          next(new ApiError(406, "Username is taken"));
-          return;
+          return next(new ApiError(406, "Username is taken"));
         }
         //if only email is in use
         if (emailCheck[0].length) {
-          next(new ApiError(406, "Email is already being used"));
-          return;
+          return next(new ApiError(406, "Email is already being used"));
         }
       }
     } else {
       // fields are missing
-      next(new ApiError(406, "some fields are missing"));
-      return;
+     return next(new ApiError(406, "some fields are missing"));
     }
-  } catch (e) {
+  } catch{
     next("error");
   }
 };
@@ -87,33 +73,19 @@ const loginUser = async (req, res, next) => {
       //if passwords match, log in user
       if (result) {
         //send jwt token
-        let token = jwt.sign(
-          {
-            isAdmin: checkUser[0][0].isAdmin,
-            id: checkUser[0][0].id,
-            username: checkUser[0][0].username,
-            firstName: checkUser[0][0].firstName,
-            surname: checkUser[0][0].surname,
-            email: checkUser[0][0].email,
-          },
-          process.env.SECRET,
-          { algorithm: "HS256", expiresIn: "2days" }
-        );
+        const token = createToken(checkUser);
         return res.json({
           request: "success",
           userId: checkUser[0][0].id,
           token,
         });
       } else {
-        next(new ApiError(406, "Username or password incorrect"));
-        next("error");
-        return;
+        return next(new ApiError(406, "Username or password incorrect"));
       }
     } else {
-      next(new ApiError(406, "Username or password incorrect"));
-      return;
+      return next(new ApiError(406, "Username or password incorrect"));
     }
-  } catch (e) {
+  } catch{
     next("error");
   }
 };
@@ -163,14 +135,32 @@ const updateUser = async (req, res, next) => {
        //if username doesn't exist update all data
        if(!checkUsername[0].length){
         let updateUserDetails = await dbQuery(`UPDATE users SET username = "${username}", firstName = "${firstName}", surname = "${surname}" WHERE id = "${req.userID}"`);
-        return res.json({request: true, moreInformation: updateUserDetails})
+        let userUpdated = await dbQuery(`SELECT * FROM users WHERE id = "${req.userID}"`);
+        let token = createToken(userUpdated);
+        if(token){
+          return res.json({
+            request: true, 
+            moreInformation: updateUserDetails,
+            token
+          })
+        }else{
+          next("error")
+        }
       }
       //if username is same as the already existing, update data except username
       if (checkUsername[0].length && checkUsername[0][0].username === user.username) {
         let updateUserDetails = await dbQuery(`UPDATE users SET firstName = "${firstName}", surname = "${surname}" WHERE id = "${req.userID}"`);
-        return res.status(200).json({ 
-          request: true, 
-          moreInformation: updateUserDetails  });
+        let userUpdated = await dbQuery(`SELECT * FROM users WHERE id = "${req.userID}"`);
+        let token = createToken(userUpdated);
+        if(token){
+          return res.status(200).json({ 
+            request: true, 
+            moreInformation: updateUserDetails,
+            token
+          });
+        }else{
+          next("error")
+        }
       }
       //if username already exists
       if(checkUsername[0][0].username !== user.username){
@@ -219,7 +209,7 @@ const updateUser = async (req, res, next) => {
     }else{
       return next(new ApiError(404, `Route with '${endpoint}' endpoint was not found`));
     }
-  } catch (e) {
+  } catch{
     return next("error");
   }
 };
