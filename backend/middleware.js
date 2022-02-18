@@ -18,13 +18,11 @@ const verifyUser = (req, res, next) => {
       next();
       return;
     } else {
-      next(new ApiError(400, "Token is invalid"));
-      return;
+      return next(new ApiError(400, "Token is invalid"));
     }
   }
   //return false as token didn't pass verification
-  next(new ApiError(404, "Token was not found"));
-  return;
+  return next(new ApiError(404, "Token was not found"));
 };
 
 const isAdmin = (req, res, next) => {
@@ -36,7 +34,6 @@ const isAdmin = (req, res, next) => {
       }
       return decode;
     });
-    console.log(user);
     //if user is an admin, next
     if (user.isAdmin) {
       return next();
