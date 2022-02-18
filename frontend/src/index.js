@@ -6,7 +6,7 @@ import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
-import Admin from "./pages/Admin";
+import Profile from "./pages/Profile";
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
@@ -17,7 +17,7 @@ ReactDOM.render(
         <Route path="/" element={<Home />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/admin" element={<Admin />} />
+        <Route path="/profile" element={<Profile />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
